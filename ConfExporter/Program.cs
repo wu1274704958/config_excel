@@ -2,6 +2,7 @@
 
 using System;
 using System.IO;
+using impl;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
@@ -17,8 +18,8 @@ namespace ConfExporter
                 IWorkbook book = new XSSFWorkbook(fs);
                 foreach (var sheet in book)
                 {
-                    Console.WriteLine($"{sheet.SheetName}");
-                    PrintSheet(sheet);   
+                    var d = new DefGenMeta().GenerateMeta(sheet);
+                    Console.WriteLine("223");
                 }
             }
         }

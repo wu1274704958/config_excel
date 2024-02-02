@@ -6,7 +6,7 @@ namespace core
     public interface ITagParser
     {
         bool MatchKey(string key);
-        object DefaultValue { get; }
+        object GetDefaultValue(IFiledType type);
         object ParseValue(string v);
     }
     public abstract class BaseTagParser<T> : ITagParser
@@ -15,8 +15,10 @@ namespace core
         {
             return key.Equals(typeof(T).Name);
         }
+
+        public abstract object GetDefaultValue(IFiledType type);
+
         public abstract Type ValueType { get; }
-        public abstract object DefaultValue { get; }
         
         public virtual object ParseValue(string v)
         {

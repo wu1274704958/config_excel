@@ -107,6 +107,7 @@
         <Compile Include="core\IGenMeta.cs" />
         <Compile Include="core\ITagParser.cs" />
         <Compile Include="impl\DefGenMeta.cs" />
+        <Compile Include="impl\tags\Key.cs" />
         <Compile Include="impl\tags\NotNull.cs" />
         <Compile Include="impl\tags\Others.cs" />
         <Compile Include="Program.cs"/>

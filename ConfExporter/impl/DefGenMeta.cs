@@ -9,7 +9,8 @@ namespace impl
     public struct FiledMetaData
     {
         public string Name { get; set; }
-        public EFiledType Type { get; set; }
+        public EFiledType TypeEnum { get; set; }
+        public IFiledType Type { get; set; }
         // only for custom type and plugin type
         public string TypeClassName { get; set; }
         public bool IsNullable { get; set; }
@@ -21,7 +22,8 @@ namespace impl
         public string MgrClassName { get; set; }
         public string ClassName { get; set; }
         public List<FiledMetaData> Fileds { get; set; }
-        public Dictionary<long,List<object>> Data { get; set; }
+        public FiledMetaData Key { get; set; }
+        public List<List<object>> Data { get; set; }
         public Dictionary<string,object> Tags { get; set; }
     }
     
@@ -39,6 +41,23 @@ namespace impl
             new NotNull(),
             new Others()
         };
+        public static readonly List<ITagParser> TagParsers = new List<ITagParser>()
+        {
+            new Key(),
+            new Others()
+        };
+        public static readonly List<IFiledType> FieldTypes = new List<IFiledType>()
+        {
+            new BaseInternalFiledType<string>(),
+            new BaseInternalFiledType<double>(),
+            new BaseInternalFiledType<float>(),
+            new BaseInternalFiledType<DateTime>(),
+            new BaseInternalFiledType<bool>(),
+            new BaseInternalFiledType<int>(),
+            new BaseInternalFiledType<long>(),
+            new BaseInternalFiledType<short>(),
+            new BaseInternalFiledType<byte>(),
+        };
         public DefMetaData GenerateMeta(ISheet sheet)
         {
             if (sheet == null) return null;
@@ -51,8 +70,15 @@ namespace impl
             defMetaData.MgrClassName = $"{Package}.{sheet.SheetName}Mgr";
             defMetaData.ClassName = $"{Package}.{sheet.SheetName}";
             defMetaData.Fileds = ParseFileds(sheet, colCount);
+            var tagsCell = sheet.GetRow(TagRow)?.GetCell(0);
+            defMetaData.Tags = tagsCell == null ? new Dictionary<string, object>() : ParseTags(tagsCell,null,TagParsers);
+            defMetaData.Key = GetKey(defMetaData.Tags.TryGetValue(nameof(Key),out var key) ? key : null,defMetaData.Fileds,"Id");
+            return defMetaData;
+        }
+
+        private FiledMetaData GetKey(object value, List<FiledMetaData> fileds, string id)
+        {
             
-            return null;
         }
 
         private List<FiledMetaData> ParseFileds(ISheet sheet, int colCount)
@@ -63,64 +89,86 @@ namespace impl
                 FiledMetaData filedMetaData = new FiledMetaData();
                 ICell cell = sheet.GetRow(NameRow)?.GetCell(i);
                 if(cell == null) 
-                    throw new Exception("GenerateMeta Error :no filed name cell");
+                    return fileds;
                 filedMetaData.Name = cell.StringCellValue;
                 cell = sheet.GetRow(TypeRow)?.GetCell(i);
                 var firstData= sheet.GetRow(FirstDataRow)?.GetCell(i);
-                if(cell == null) 
-                    throw new Exception("GenerateMeta Error :no filed type cell");
-                filedMetaData.Type = ParseFiledType(cell,firstData,out string typeClassName);
+                filedMetaData.TypeEnum = ParseFiledType(cell,firstData,out string typeClassName,out var filedType);
+                filedMetaData.Type = filedType;
+                if (filedMetaData.TypeEnum == EFiledType.None || filedMetaData.Type == null)
+                    throw new Exception("GenerateMeta Error :parse filed type failed");
                 filedMetaData.TypeClassName = typeClassName;
                 cell = sheet.GetRow(FieldTagsRow)?.GetCell(i);
-                
-                if(cell == null)
-                    throw new Exception("GenerateMeta Error :no filed tags cell");
-                filedMetaData.Tags = ParseTags(cell,firstData);
+                filedMetaData.Tags = ParseTags(cell,filedMetaData.Type,FieldTagParsers);
                 filedMetaData.IsNullable = true;
-                if(filedMetaData.Tags.TryGetValue("NotNull", out var tag))
+                if(filedMetaData.Tags.TryGetValue(nameof(NotNull), out var tag))
                    filedMetaData.IsNullable = !(bool)tag;
+                fileds.Add(filedMetaData);
             }
-
             return fileds;
         }
 
-        private Dictionary<string,object> ParseTags(ICell cell, ICell firstData)
+        private void PreParseTags(ICell cell, Action<string, string> f)
         {
-            var res = new Dictionary<string,object>();
-            var str = cell.StringCellValue;
-            if (str == null) return res;
+            string str = null;
+            if (cell == null || cell.CellType != CellType.String || (str = cell.StringCellValue) == null) return;
             var arr = str.Split(';');
             foreach (var item in arr)
             {
                 if(item.Length == 0) continue;
                 var kv = item.Split(':');
-                if(res.ContainsKey(kv[0])) throw new Exception("Duplicate tag: " + kv[0]);
-                foreach (var parser in FieldTagParsers)
+                f(kv[0],kv.Length == 1 ? null : kv[1]);
+            }
+        }
+
+        private Dictionary<string,object> ParseTags(ICell cell, IFiledType filedType,List<ITagParser> tagParsers)
+        {
+            var res = new Dictionary<string,object>();
+            PreParseTags(cell, (k, v) =>
+            {
+                if (res.ContainsKey(k)) throw new Exception("Duplicate tag: " + k);
+                foreach (var parser in tagParsers)
                 {
-                    if (parser.MatchKey(kv[0]))
+                    if (parser.MatchKey(k))
                     {
                         object val = null;
-                        if (kv.Length == 1)
+                        if (v == null)
                         {
-                            val = parser.DefaultValue;
-                            if(val == null)
-                                throw new Exception("No default value for tag: " + kv[0]);
+                            val = parser.GetDefaultValue(filedType);
+                            if (val == null)
+                                throw new Exception("No default value for tag: " + k);
                         }
                         else
-                            val = parser.ParseValue(kv[1]);
-                        if(val == null)
-                            throw new Exception("Parse value error for tag: " + kv[0]);
-                        res.Add(kv[0],val);
+                            val = parser.ParseValue(v);
+
+                        if (val == null)
+                            throw new Exception("Parse value error for tag: " + k);
+                        res.Add(k, val);
                         break;
                     }
                 }
-            }
+            });
             return res;
         }
 
-        private EFiledType ParseFiledType(ICell cell, ICell firstData,out string typeClassName)
+        private EFiledType ParseFiledType(ICell cell, ICell firstData,out string typeClassName,out IFiledType type)
         {
-            
+            string specifiedTy = null;
+            if (cell != null && cell.CellType == CellType.String && cell.StringCellValue?.Length > 0)
+                specifiedTy = cell.StringCellValue;
+            foreach (var ty in FieldTypes)
+            {
+                var f = specifiedTy == null ? ty.TryDeduceType(firstData) : ty.IsMatch(specifiedTy);
+                if (f)
+                {
+                    type = ty;
+                    typeClassName = ty.FullTypeName;
+                    return ty.TypeEnum;
+                }
+            }
+            type = null;
+            typeClassName = null;
+            return EFiledType.None;
         }
     }
 }

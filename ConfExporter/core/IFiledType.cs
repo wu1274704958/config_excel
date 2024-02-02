@@ -5,12 +5,12 @@ namespace core
 {
     public enum EFiledType
     {
+        None,
         String,
         Numeric,
         DateTime,
         Boolean,
         CustomType,
-        PluginType
     }
 
     public static class FiledTypeUtil
@@ -52,9 +52,11 @@ namespace core
         bool IsArray { get; }
         bool IsDictionary { get; }
         bool IsMatch(string typeName);
+        string FullTypeName { get; }
+        object DefaultValue { get; }
     }
 
-    public abstract class BaseInternalFiledType<T> : IFiledType
+    public class BaseInternalFiledType<T> : IFiledType
     {
         private readonly Type _type = typeof(T);
         protected Type InternalType => _type;
@@ -66,6 +68,11 @@ namespace core
                 {
                     case Type t when t == typeof(string): return EFiledType.String;
                     case Type t when t == typeof(double): return EFiledType.Numeric;
+                    case Type t when t == typeof(int): return EFiledType.Numeric;
+                    case Type t when t == typeof(long): return EFiledType.Numeric;
+                    case Type t when t == typeof(float): return EFiledType.Numeric;
+                    case Type t when t == typeof(short): return EFiledType.Numeric;
+                    case Type t when t == typeof(byte): return EFiledType.Numeric;
                     case Type t when t == typeof(DateTime): return EFiledType.DateTime;
                     case Type t when t == typeof(bool): return EFiledType.Boolean;
                     default: throw new Exception("Not support type: " + _type.Name);
@@ -134,6 +141,27 @@ namespace core
         public bool IsMatch(string typeName)
         {
             return _type.Name.Equals(typeName);
+        }
+        public string FullTypeName => _type.FullName;
+
+        public object DefaultValue
+        {
+            get
+            {
+                switch (_type)
+                {
+                    case Type t when t == typeof(string): return "";
+                    case Type t when t == typeof(double): return 0.0;
+                    case Type t when t == typeof(float): return 0.0f;
+                    case Type t when t == typeof(int): return 0;
+                    case Type t when t == typeof(short): return (short)0;
+                    case Type t when t == typeof(byte): return (byte)0;
+                    case Type t when t == typeof(long): return 0;
+                    case Type t when t == typeof(DateTime): return DateTime.Now;
+                    case Type t when t == typeof(bool): return false;
+                }
+                return null;
+            }
         }
     }
 }
