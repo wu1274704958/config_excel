@@ -15,6 +15,8 @@ namespace impl
         public string TypeClassName { get; set; }
         public bool IsNullable { get; set; }
         public Dictionary<string,object> Tags { get; set; }
+        
+        public bool Invalid => Type == null || TypeEnum == EFiledType.None || TypeClassName == null || Name == null;
     }
     public class DefMetaData
     {
@@ -72,13 +74,44 @@ namespace impl
             defMetaData.Fileds = ParseFileds(sheet, colCount);
             var tagsCell = sheet.GetRow(TagRow)?.GetCell(0);
             defMetaData.Tags = tagsCell == null ? new Dictionary<string, object>() : ParseTags(tagsCell,null,TagParsers);
-            defMetaData.Key = GetKey(defMetaData.Tags.TryGetValue(nameof(Key),out var key) ? key : null,defMetaData.Fileds,"Id");
+            defMetaData.Key = GetKey(defMetaData.Tags.TryGetValue(nameof(Key),out var key) ? key : null,defMetaData.Fileds);
+            if(defMetaData.Key.Invalid)
+                throw new Exception("GenerateMeta Error :no key filed");
+            defMetaData.Data = ParseData(sheet, defMetaData.Fileds, defMetaData.Key);
             return defMetaData;
         }
 
-        private FiledMetaData GetKey(object value, List<FiledMetaData> fileds, string id)
+        private List<List<object>> ParseData(ISheet sheet, List<FiledMetaData> fileds, FiledMetaData key)
         {
-            
+            List<List<object>> datas = new List<List<object>>();
+            for (int r = FirstDataRow; r < sheet.LastRowNum + 1; r++)
+            {
+                var row = new List<object>();
+                for (int c = 0;c < fileds.Count; c++)
+                {
+                    var f = fileds[c];
+                    object value = null;
+                    var cell = sheet.GetRow(r)?.GetCell(c);
+                    if(cell == null && !f.IsNullable)
+                        throw new Exception($"ParseData Error :no cell r={r},c={c}");
+                    value = cell == null ? f.Type.DefaultValue : f.Type.ParseValue(cell);
+                    row.Add(value);
+                }
+                datas.Add(row);
+            }
+            return datas;
+        }
+
+        private FiledMetaData GetKey(object value, List<FiledMetaData> fileds, string id = "Id")
+        {
+            if(!string.IsNullOrEmpty(value as string))
+                id = (string)value;
+            foreach (var f in fileds)
+            {
+                if (f.Name == id)
+                    return f;
+            }
+            return default(FiledMetaData);
         }
 
         private List<FiledMetaData> ParseFileds(ISheet sheet, int colCount)

@@ -1,6 +1,7 @@
 ﻿
 
 using System;
+using System.Collections.Generic;
 using System.IO;
 using impl;
 using NPOI.HSSF.UserModel;
@@ -13,6 +14,8 @@ namespace ConfExporter
     {
         public static void Main(string[] args)
         {
+            var l = new List<string>();
+            l.Add(null);
             using (FileStream fs = new FileStream(args[0],FileMode.Open,FileAccess.Read))
             {
                 IWorkbook book = new XSSFWorkbook(fs);

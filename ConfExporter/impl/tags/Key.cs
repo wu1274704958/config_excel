@@ -7,7 +7,7 @@ namespace impl.tags
     {
         public override object GetDefaultValue(IFiledType type)
         {
-            return null;
+            return "Id";
         }
         public override Type ValueType => typeof(string);
     }
