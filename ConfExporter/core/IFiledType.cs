@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Globalization;
 using NPOI.SS.UserModel;
 
 namespace core
@@ -117,19 +118,30 @@ namespace core
             {
                 switch (_type)
                 {
-                    case Type t when t == typeof(string): return v.StringCellValue;
+                    case Type t when t == typeof(string):
+                        switch (v.CellType)
+                        {
+                            case CellType.Numeric:
+                                return v.NumericCellValue.ToString();
+                            case CellType.String:
+                                return v.StringCellValue;
+                            case CellType.Boolean:
+                                return v.BooleanCellValue.ToString();
+                            default:
+                                throw new Exception($"Parse value error type is {_type}: content:{v}");
+                        }
                     case Type t when t == typeof(double):
                         return v.CellType == CellType.Numeric ? v.NumericCellValue : double.Parse(v.StringCellValue);
                     case Type t when t == typeof(float):
-                        return v.CellType == CellType.Numeric ? v.NumericCellValue : float.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? (float)v.NumericCellValue : float.Parse(v.StringCellValue);
                     case Type t when t == typeof(int):
-                        return v.CellType == CellType.Numeric ? v.NumericCellValue : int.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? (int)v.NumericCellValue : int.Parse(v.StringCellValue);
                     case Type t when t == typeof(short):
-                        return v.CellType == CellType.Numeric ? v.NumericCellValue : short.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? (short)v.NumericCellValue : short.Parse(v.StringCellValue);
                     case Type t when t == typeof(byte): 
-                        return v.CellType == CellType.Numeric ? v.NumericCellValue : byte.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? (byte)v.NumericCellValue : byte.Parse(v.StringCellValue);
                     case Type t when t == typeof(long): 
-                        return v.CellType == CellType.Numeric ? v.NumericCellValue : long.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? (long)v.NumericCellValue : long.Parse(v.StringCellValue);
                     case Type t when t == typeof(DateTime): 
                         return v.CellType == CellType.Numeric && v.CellStyle.DataFormat == 14 ? v.DateCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
                     case Type t when t == typeof(bool): 

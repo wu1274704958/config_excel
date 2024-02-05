@@ -14,6 +14,11 @@ namespace ConfExporter
     {
         public static void Main(string[] args)
         {
+            unit_test.TestDynLoadCode.Test();
+        }
+
+        private static void LoadTable(string[] args)
+        {
             var l = new List<string>();
             l.Add(null);
             using (FileStream fs = new FileStream(args[0],FileMode.Open,FileAccess.Read))
@@ -69,5 +74,7 @@ namespace ConfExporter
                 }
             }
         }
+
+        
     }
 }
