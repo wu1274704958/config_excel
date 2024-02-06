@@ -55,12 +55,13 @@ namespace core
         bool IsMatch(string typeName);
         string FullTypeName { get; }
         object DefaultValue { get; }
+        Type Type { get; }
     }
 
     public class BaseInternalFiledType<T> : IFiledType
     {
         private readonly Type _type = typeof(T);
-        protected Type InternalType => _type;
+        public Type Type => _type;
         public virtual EFiledType TypeEnum
         {
             get

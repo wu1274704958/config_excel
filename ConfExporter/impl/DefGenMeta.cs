@@ -22,10 +22,13 @@ namespace impl
     {
         public string Package { get; set; }
         public string MgrClassName { get; set; }
+        public string FullClassName => $"{Package}.{ClassName}";
+        public string FullMgrClassName => $"{Package}.{MgrClassName}";
         public string ClassName { get; set; }
         public List<FiledMetaData> Fileds { get; set; }
         public FiledMetaData Key { get; set; }
-        public List<List<object>> Data { get; set; }
+        public int KeyIndex { get; set; }
+        //public List<List<object>> Data { get; set; }
         public Dictionary<string,object> Tags { get; set; }
     }
     
@@ -41,6 +44,7 @@ namespace impl
         public static readonly List<ITagParser> FieldTagParsers = new List<ITagParser>()
         {
             new NotNull(),
+            new Reference(),
             new Others()
         };
         public static readonly List<ITagParser> TagParsers = new List<ITagParser>()
@@ -69,15 +73,15 @@ namespace impl
             int colCount = nameRow.LastCellNum + 1;
             DefMetaData defMetaData = new DefMetaData();
             defMetaData.Package = Package; 
-            defMetaData.MgrClassName = $"{Package}.{sheet.SheetName}Mgr";
-            defMetaData.ClassName = $"{Package}.{sheet.SheetName}";
+            defMetaData.MgrClassName = $"{sheet.SheetName}Mgr";
+            defMetaData.ClassName = $"{sheet.SheetName}";
             defMetaData.Fileds = ParseFileds(sheet, colCount);
             var tagsCell = sheet.GetRow(TagRow)?.GetCell(0);
             defMetaData.Tags = tagsCell == null ? new Dictionary<string, object>() : ParseTags(tagsCell,null,TagParsers);
-            defMetaData.Key = GetKey(defMetaData.Tags.TryGetValue(nameof(Key),out var key) ? key : null,defMetaData.Fileds);
+            (defMetaData.Key,defMetaData.KeyIndex) = GetKey(defMetaData.Tags.TryGetValue(nameof(Key),out var key) ? key : null,defMetaData.Fileds);
             if(defMetaData.Key.Invalid)
                 throw new Exception("GenerateMeta Error :no key filed");
-            defMetaData.Data = ParseData(sheet, defMetaData.Fileds, defMetaData.Key);
+            //defMetaData.Data = ParseData(sheet, defMetaData.Fileds, defMetaData.Key);
             return defMetaData;
         }
 
@@ -102,16 +106,17 @@ namespace impl
             return datas;
         }
 
-        private FiledMetaData GetKey(object value, List<FiledMetaData> fileds, string id = "Id")
+        private (FiledMetaData,int) GetKey(object value, List<FiledMetaData> fileds, string id = "Id")
         {
             if(!string.IsNullOrEmpty(value as string))
                 id = (string)value;
-            foreach (var f in fileds)
+            for (int i = 0; i < fileds.Count; i++)
             {
+                var f = fileds[i];
                 if (f.Name == id)
-                    return f;
+                    return (f,i);
             }
-            return default(FiledMetaData);
+            return (default(FiledMetaData),-1);
         }
 
         private List<FiledMetaData> ParseFileds(ISheet sheet, int colCount)
