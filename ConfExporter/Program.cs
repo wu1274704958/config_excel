@@ -3,6 +3,7 @@
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using CommandLine;
 using conf;
@@ -17,16 +18,53 @@ namespace ConfExporter
     {
         class Options
         {
+            [Option('c',"code",Required = false,HelpText = "code output dir",Default = "code")]
             public string CodeOutDir { get; set; }
+            [Option('d',"data",Required = false,HelpText = "data output dir",Default = "data")]
             public string DataOutDir { get; set; }
+            [Option('i',"input",Required = true,HelpText = "input file or dir")]
+            public string InputFile { get; set; }
+            [Option(Required = false,Default = false,HelpText = "only gen data")]
+            public bool OnlyGenData { get; set; }
         }
         public static void Main(string[] args)
         {
+            CommandLine.Parser.Default.ParseArguments<Options>(args)
+                .WithParsed(RunOptions)
+                .WithNotParsed(HandleParseError);
+        }
+
+        private static void HandleParseError(IEnumerable<Error> obj)
+        {
             
-            conf.Sheet1Mgr.InitInstance(new FileInfo("D:\\code\\ConfExporter\\ConfExporter\\bin\\Debug\\data\\Sheet1.dat"));
-            var d = conf.Sheet1Mgr.GetInstance().Get(1);
-            Console.WriteLine("{0} {1} {2} {3}",d.Id,d.Name,d.Age,d.Birthday);
-            
+        }
+
+        private static void RunOptions(Options obj)
+        {
+            var @in = new List<FileInfo>();
+            if (File.Exists(obj.InputFile))
+            {
+                @in.Add(new FileInfo(obj.InputFile));
+            }
+            else if(Directory.Exists(obj.InputFile))
+            {
+                foreach (var f in new DirectoryInfo(obj.InputFile).GetFiles())
+                {
+                    if(f.Extension.EndsWith("xlsx"))
+                        @in.Add(f);
+                }
+            }
+            if (@in.Count == 0)
+            {
+                Debug.Fail("no input file");
+                return;
+            }
+            var codeOutDir = new DirectoryInfo(obj.CodeOutDir);
+            var dataOutDir = new DirectoryInfo(obj.DataOutDir);
+            if (codeOutDir.Exists == false) codeOutDir.Create();
+            if (dataOutDir.Exists == false) dataOutDir.Create();
+            var count = new DefExporter().Export(@in.ToArray(), codeOutDir, dataOutDir, obj.OnlyGenData);
+            Console.WriteLine($"done {count}");
         }
 
         private static void LoadTable(string[] args)

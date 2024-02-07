@@ -117,13 +117,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="bin\Debug\conf\Sheet1Mgr.cs" />
+    <Compile Include="core\IExporter.cs" />
     <Compile Include="core\IFiledType.cs" />
     <Compile Include="core\IGenCode.cs" />
     <Compile Include="core\IGenMeta.cs" />
     <Compile Include="core\ILoadData.cs" />
     <Compile Include="core\ISerializer.cs" />
     <Compile Include="core\ITagParser.cs" />
+    <Compile Include="impl\DefExporter.cs" />
     <Compile Include="impl\DefGenCode.cs" />
     <Compile Include="impl\DefGenMeta.cs" />
     <Compile Include="impl\DefLoad.cs" />
