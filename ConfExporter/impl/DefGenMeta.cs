@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using core;
+using core.filed_type;
 using impl.tags;
 using NPOI.SS.UserModel;
 
@@ -63,6 +64,16 @@ namespace impl
             new BaseInternalFiledType<long>(),
             new BaseInternalFiledType<short>(),
             new BaseInternalFiledType<byte>(),
+            
+            new InternalArrayType<string>(),
+            new InternalArrayType<double>(),
+            new InternalArrayType<float>(),
+            new InternalArrayType<DateTime>(),
+            new InternalArrayType<bool>(),
+            new InternalArrayType<int>(),
+            new InternalArrayType<long>(),
+            new InternalArrayType<short>(),
+            new InternalArrayType<byte>(),
         };
         public DefMetaData GenerateMeta(ISheet sheet)
         {
@@ -188,7 +199,19 @@ namespace impl
             });
             return res;
         }
-
+        
+        private IFiledType MatchOtherType(string specifiedTy)
+        {
+            foreach (var ty in FieldTypes)
+            {
+                if (ty.IsMatch(specifiedTy))
+                {
+                    return ty;
+                }
+            }
+            return null;
+        }
+        
         private EFiledType ParseFiledType(ICell cell, ICell firstData,out string typeClassName,out IFiledType type)
         {
             string specifiedTy = null;
@@ -196,7 +219,7 @@ namespace impl
                 specifiedTy = cell.StringCellValue;
             foreach (var ty in FieldTypes)
             {
-                var f = specifiedTy == null ? ty.TryDeduceType(firstData) : ty.IsMatch(specifiedTy);
+                var f = specifiedTy == null ? ty.TryDeduceType(firstData) : ty.IsMatch(specifiedTy,MatchOtherType);
                 if (f)
                 {
                     type = ty;

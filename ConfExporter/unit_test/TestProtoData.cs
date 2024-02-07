@@ -29,7 +29,7 @@ namespace conf
             _instance = null;
             using (FileStream fs = file.Open(FileMode.Open, FileAccess.Read))
             {
-                _instance = Serializer.Deserialize<TestMgr>(fs);
+                _instance = Serializer.DeserializeWithLengthPrefix<TestMgr>(fs, PrefixStyle.Fixed32);
                 Debug.Assert(_instance != null,"Load Config Test failed at "+file.FullName);
                 _lastReadFile = file;
             }
@@ -44,7 +44,7 @@ namespace conf
         {
             using (FileStream fs = file.Open(FileMode.OpenOrCreate, FileAccess.Write))
             {
-                Serializer.Serialize(fs, _instance);
+                Serializer.SerializeWithLengthPrefix(fs, _instance,PrefixStyle.Fixed32);
             }
         }
         public static void AppendData(Int32 id,Test d)

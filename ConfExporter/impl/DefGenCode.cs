@@ -54,7 +54,7 @@ public static void InitInstance(FileInfo file)
     _instance = null;
     using (FileStream fs = file.Open(FileMode.Open, FileAccess.Read))
     {{
-        _instance = Serializer.Deserialize<{mgrName}>(fs);
+        _instance = Serializer.DeserializeWithLengthPrefix<{mgrName}>(fs, PrefixStyle.Fixed32);
         Debug.Assert(_instance != null,""Load Config {meta.ClassName} failed at ""+file.FullName);
         _lastReadFile = file;
     }}
@@ -69,7 +69,7 @@ public static void Save(FileInfo file)
 {{
     using (FileStream fs = file.Open(FileMode.OpenOrCreate, FileAccess.Write))
     {{
-        Serializer.Serialize(fs, _instance);
+        Serializer.SerializeWithLengthPrefix(fs, _instance, PrefixStyle.Fixed32);
     }}
 }}
 public static void AppendData(Int32 id,{meta.ClassName} d)

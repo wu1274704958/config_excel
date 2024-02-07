@@ -12,6 +12,7 @@ namespace core
         DateTime,
         Boolean,
         CustomType,
+        Array,
     }
 
     public static class FiledTypeUtil
@@ -49,10 +50,11 @@ namespace core
         EFiledType TypeEnum { get; }
         bool TryDeduceType(ICell cell);
         object ParseValue(ICell v);
+        object ParseValue(string v);
         bool IsInternalType { get; }
         bool IsArray { get; }
         bool IsDictionary { get; }
-        bool IsMatch(string typeName);
+        bool IsMatch(string typeName,Func<string,IFiledType> matchOther=null);
         string FullTypeName { get; }
         object DefaultValue { get; }
         Type Type { get; }
@@ -117,13 +119,15 @@ namespace core
         {
             try
             {
+                if (v.CellType == CellType.String)
+                    return ParseValue(v.StringCellValue);
                 switch (_type)
                 {
                     case Type t when t == typeof(string):
                         switch (v.CellType)
                         {
                             case CellType.Numeric:
-                                return v.NumericCellValue.ToString();
+                                return Convert.ToString(v.NumericCellValue, CultureInfo.InvariantCulture);
                             case CellType.String:
                                 return v.StringCellValue;
                             case CellType.Boolean:
@@ -132,21 +136,54 @@ namespace core
                                 throw new Exception($"Parse value error type is {_type}: content:{v}");
                         }
                     case Type t when t == typeof(double):
-                        return v.CellType == CellType.Numeric ? v.NumericCellValue : double.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
                     case Type t when t == typeof(float):
-                        return v.CellType == CellType.Numeric ? (float)v.NumericCellValue : float.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? (float)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
                     case Type t when t == typeof(int):
-                        return v.CellType == CellType.Numeric ? (int)v.NumericCellValue : int.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? (int)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
                     case Type t when t == typeof(short):
-                        return v.CellType == CellType.Numeric ? (short)v.NumericCellValue : short.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? (short)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
                     case Type t when t == typeof(byte): 
-                        return v.CellType == CellType.Numeric ? (byte)v.NumericCellValue : byte.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? (byte)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
                     case Type t when t == typeof(long): 
-                        return v.CellType == CellType.Numeric ? (long)v.NumericCellValue : long.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? (long)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
                     case Type t when t == typeof(DateTime): 
                         return v.CellType == CellType.Numeric && v.CellStyle.DataFormat == 14 ? v.DateCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
                     case Type t when t == typeof(bool): 
-                        return v.CellType == CellType.Boolean ? v.BooleanCellValue : bool.Parse(v.StringCellValue);
+                        return v.CellType == CellType.Boolean ? v.BooleanCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception($"Parse value error type is {_type}: content:{v}", e);
+            }
+            return null;
+        }
+
+        public object ParseValue(string v)
+        {
+            try
+            {
+                switch (_type)
+                {
+                    case Type t when t == typeof(string):
+                        return v;
+                    case Type t when t == typeof(double):
+                        return double.Parse(v);
+                    case Type t when t == typeof(float):
+                        return float.Parse(v);
+                    case Type t when t == typeof(int):
+                        return int.Parse(v);
+                    case Type t when t == typeof(short):
+                        return short.Parse(v);
+                    case Type t when t == typeof(byte): 
+                        return byte.Parse(v);
+                    case Type t when t == typeof(long): 
+                        return long.Parse(v);
+                    case Type t when t == typeof(DateTime): 
+                        return Convert.ToDateTime(v);
+                    case Type t when t == typeof(bool): 
+                        return bool.Parse(v);
                 }
             }
             catch (Exception e)
@@ -159,7 +196,7 @@ namespace core
         public bool IsInternalType => TypeEnum.IsInternalType();
         public bool IsArray => false;
         public bool IsDictionary => false;
-        public bool IsMatch(string typeName)
+        public bool IsMatch(string typeName,Func<string,IFiledType> matchOther = null)
         {
             return _type.Name.Equals(typeName);
         }
