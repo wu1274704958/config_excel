@@ -13,6 +13,7 @@ namespace core
         Boolean,
         CustomType,
         Array,
+        Dictionary
     }
 
     public static class FiledTypeUtil

@@ -74,6 +74,22 @@ namespace impl
             new InternalArrayType<long>(),
             new InternalArrayType<short>(),
             new InternalArrayType<byte>(),
+            
+            new InternalDictType<int,string>(),
+            new InternalDictType<int,int>(),
+            new InternalDictType<int,long>(),
+            new InternalDictType<int,float>(),
+            new InternalDictType<int,double>(),
+            new InternalDictType<int,bool>(),
+            new InternalDictType<int,DateTime>(),
+            
+            new InternalDictType<string,string>(),
+            new InternalDictType<string,int>(),
+            new InternalDictType<string,long>(),
+            new InternalDictType<string,float>(),
+            new InternalDictType<string,double>(),
+            new InternalDictType<string,bool>(),
+            new InternalDictType<string,DateTime>(),
         };
         public DefMetaData GenerateMeta(ISheet sheet)
         {
