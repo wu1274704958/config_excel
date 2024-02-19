@@ -78,7 +78,7 @@ namespace ConfExporter
                 IWorkbook book = new XSSFWorkbook(fs);
                 foreach (var sheet in book)
                 {
-                    var d = new DefGenMeta().GenerateMeta(sheet);
+                    var d = new DefGenMeta().GenerateMeta(sheet,new FileInfo(args[0]).Name);
                     var dict =  new ConcurrentDictionary<string, string>();
                     var code = new DefGenCode().GenerateCode(d, ref dict);
                     foreach (var f in dict)

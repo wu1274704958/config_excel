@@ -32,8 +32,12 @@ namespace impl
             AppendRightCurlyBraces(sb);
             
             AppendRightCurlyBraces(sb);
+            var dir = meta.Package;
+            var dotIdx = -1;
+            if ((dotIdx = dir.IndexOf('.')) > 0)
+                dir = dir.Substring(dotIdx + 1);
             
-            if(!codeList.TryAdd(meta.MgrClassName, sb.ToString()))
+            if(!codeList.TryAdd($"{dir}/{meta.MgrClassName}", sb.ToString()))
                 throw new Exception("Same code exists: "+meta.MgrClassName);
             return res;
         }

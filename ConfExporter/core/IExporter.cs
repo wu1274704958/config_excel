@@ -17,23 +17,27 @@ namespace core
             int ret = 0;
             foreach (var f in @in)
             {
+                var fileName = f.Name;
+                var extIdx = fileName.IndexOf('.');
+                if(extIdx > 0)
+                    fileName = fileName.Substring(0,extIdx);
                 using (FileStream fs = f.Open( FileMode.Open, FileAccess.Read))
                 {
                     IWorkbook book = new XSSFWorkbook(fs);
                     foreach (var sheet in book)
                     {
-                        ret += HandleSheet(sheet, outCodeDir, outDataDir, onlyGenData);
+                        ret += HandleSheet(sheet, outCodeDir, outDataDir, onlyGenData,fileName);
                     }
                 }
             }
             return ret;
         }
         
-        protected virtual int HandleSheet(ISheet sheet, DirectoryInfo outCodeDir, DirectoryInfo outDataDir, bool onlyGenData)
+        protected virtual int HandleSheet(ISheet sheet, DirectoryInfo outCodeDir, DirectoryInfo outDataDir, bool onlyGenData,string fileName)
         {
             try
             {
-                var d = new GM().GenerateMeta(sheet);
+                var d = new GM().GenerateMeta(sheet,fileName);
                 var dict = new ConcurrentDictionary<string, string>();
                 var code = new GC().GenerateCode(d, ref dict);
                 if (!onlyGenData)
@@ -56,6 +60,14 @@ namespace core
         
         protected static void WriteFile(string name, string cnt, string suffix, string dir)
         {
+            var delimiter = name.IndexOf('/');
+            if (delimiter > 0)
+            {
+                dir = Path.Combine(dir, name.Substring(0, delimiter));
+                name = name.Substring(delimiter + 1);
+            }
+            if (Directory.Exists(dir) == false)
+                Directory.CreateDirectory(dir);
             var path = Path.Combine(dir, name + suffix);
             File.WriteAllText(path, cnt);
         }

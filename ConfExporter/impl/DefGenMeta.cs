@@ -91,7 +91,7 @@ namespace impl
             new InternalDictType<string,bool>(),
             new InternalDictType<string,DateTime>(),
         };
-        public DefMetaData GenerateMeta(ISheet sheet)
+        public DefMetaData GenerateMeta(ISheet sheet,string fileName)
         {
             if (sheet == null) return null;
             int rowCount = sheet.LastRowNum + 1;
@@ -99,7 +99,7 @@ namespace impl
             if(nameRow == null) throw new Exception("GenerateMeta Error :no filed name row");
             int colCount = nameRow.LastCellNum + 1;
             DefMetaData defMetaData = new DefMetaData();
-            defMetaData.Package = Package; 
+            defMetaData.Package = $"{Package}.{fileName}"; 
             defMetaData.MgrClassName = $"{sheet.SheetName}Mgr";
             defMetaData.ClassName = $"{sheet.SheetName}";
             defMetaData.Fileds = ParseFileds(sheet, colCount);

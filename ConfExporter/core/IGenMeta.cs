@@ -4,6 +4,6 @@ namespace core
 {
     public interface IGenMeta<out MD>
     {
-        MD GenerateMeta(ISheet sheet);
+        MD GenerateMeta(ISheet sheet,string fileName);
     }
 }
