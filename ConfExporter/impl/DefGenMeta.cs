@@ -153,7 +153,7 @@ namespace impl
             {
                 FiledMetaData filedMetaData = new FiledMetaData();
                 ICell cell = sheet.GetRow(NameRow)?.GetCell(i);
-                if(cell == null) 
+                if(cell == null || cell.CellType == CellType.Blank) 
                     return fileds;
                 filedMetaData.Name = cell.StringCellValue;
                 cell = sheet.GetRow(TypeRow)?.GetCell(i);

@@ -42,7 +42,13 @@ namespace impl
                     var f = meta.Fileds[j];
                     dataTy.GetProperty(f.Name).SetValue(obj, row[j]);
                 }
-                appendMethod.Invoke(null,new object[] { key,obj });
+                try
+                {
+                    appendMethod.Invoke(null, new object[] { key, obj });
+                }catch(Exception e)
+                {
+                    throw new Exception($"Append Data failed key = {key}", e);
+                }
             }
             return mgrTy;
         }

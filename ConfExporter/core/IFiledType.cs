@@ -120,6 +120,8 @@ namespace core
         {
             try
             {
+                if (v.CellType == CellType.Blank)
+                    return DefaultValue;
                 if (v.CellType == CellType.String)
                     return ParseValue(v.StringCellValue);
                 switch (_type)
@@ -137,21 +139,21 @@ namespace core
                                 throw new Exception($"Parse value error type is {_type}: content:{v}");
                         }
                     case Type t when t == typeof(double):
-                        return v.CellType == CellType.Numeric ? v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
+                        return v.CellType == CellType.Numeric || v.CellType == CellType.Formula ? v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v.Address} cellty = {v.CellType}");
                     case Type t when t == typeof(float):
-                        return v.CellType == CellType.Numeric ? (float)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
+                        return v.CellType == CellType.Numeric || v.CellType == CellType.Formula ? (float)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v.Address} cellty = {v.CellType}");
                     case Type t when t == typeof(int):
-                        return v.CellType == CellType.Numeric ? (int)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
+                        return v.CellType == CellType.Numeric || v.CellType == CellType.Formula ? (int)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v.Address} cellty = {v.CellType}");
                     case Type t when t == typeof(short):
-                        return v.CellType == CellType.Numeric ? (short)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
+                        return v.CellType == CellType.Numeric || v.CellType == CellType.Formula ? (short)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v.Address} cellty = {v.CellType}");
                     case Type t when t == typeof(byte): 
-                        return v.CellType == CellType.Numeric ? (byte)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
+                        return v.CellType == CellType.Numeric || v.CellType == CellType.Formula ? (byte)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v.Address} cellty = {v.CellType}");
                     case Type t when t == typeof(long): 
-                        return v.CellType == CellType.Numeric ? (long)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
+                        return v.CellType == CellType.Numeric || v.CellType == CellType.Formula ? (long)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v.Address} cellty = {v.CellType}");
                     case Type t when t == typeof(DateTime): 
-                        return v.CellType == CellType.Numeric && v.CellStyle.DataFormat == 14 ? v.DateCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
+                        return v.CellType == CellType.Numeric && v.CellStyle.DataFormat == 14 ? v.DateCellValue : throw new Exception($"Parse value error type is {_type}: content:{v.Address} cellty = {v.CellType}");
                     case Type t when t == typeof(bool): 
-                        return v.CellType == CellType.Boolean ? v.BooleanCellValue : throw new Exception($"Parse value error type is {_type}: content:{v}");
+                        return v.CellType == CellType.Boolean ? v.BooleanCellValue : throw new Exception($"Parse value error type is {_type}: content:{v} cellty = {v.CellType}");
                 }
             }
             catch (Exception e)

@@ -26,13 +26,16 @@ namespace impl
                     var f = fileds[c];
                     object value = null;
                     var cell = sheet.GetRow(r)?.GetCell(c);
-                    if(cell == null && !f.IsNullable)
+                    if (f.Name == key.Name && (cell == null || cell.CellType == CellType.Blank))
+                        goto End;
+                    if (cell == null && !f.IsNullable)
                         throw new Exception($"ParseData Error :no cell r={r},c={c}");
                     value = cell == null ? f.Type.DefaultValue : f.Type.ParseValue(cell);
                     row.Add(value);
                 }
                 datas.Add(row);
             }
+            End:
             return datas;
         }
 
