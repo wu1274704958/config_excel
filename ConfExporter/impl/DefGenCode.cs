@@ -21,12 +21,13 @@ namespace impl
             AppendNameSpaceHead(sb, meta.Package);
             AppendLeftCurlyBraces(sb);
             //data class
-            AppendClassHead(sb, meta.ClassName);
+            var sealedVal = meta.Tags.TryGetValue(nameof(Sealed), out var v) ? (int)v : 0;
+            AppendClassHead(sb, meta.ClassName,(sealedVal & 1) == 1);
             AppendLeftCurlyBraces(sb);
             AppendClassBody(sb, meta);
             AppendRightCurlyBraces(sb);
             //mgr class
-            AppendClassHead(sb, meta.MgrClassName);
+            AppendClassHead(sb, meta.MgrClassName,(sealedVal & 2) == 2);
             AppendLeftCurlyBraces(sb);
             AppendMgrClassBody(sb, meta);
             AppendRightCurlyBraces(sb);
@@ -98,11 +99,12 @@ public static void AppendData(Int32 id,{meta.ClassName} d)
             }
         }
 
-        private void AppendClassHead(StringBuilder sb, string className)
+        private void AppendClassHead(StringBuilder sb, string className,bool @sealed = false)
         {
+            var preClass = @sealed ? "sealed" : "";
             sb.Append($@"
 [ProtoContract]
-public class {className}
+public {preClass} class {className}
             ");
         }
 
