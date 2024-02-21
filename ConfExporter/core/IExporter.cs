@@ -24,8 +24,11 @@ namespace core
                 using (FileStream fs = f.Open( FileMode.Open, FileAccess.Read))
                 {
                     IWorkbook book = new XSSFWorkbook(fs);
+                    Context.Instance.CurrentBook = book;
                     foreach (var sheet in book)
                     {
+                        if(sheet.SheetName[0] == '_')
+                            continue;
                         ret += HandleSheet(sheet, outCodeDir, outDataDir, onlyGenData,fileName);
                     }
                 }
@@ -37,6 +40,7 @@ namespace core
         {
             try
             {
+                Context.Instance.CurrentSheet = sheet;
                 var d = new GM().GenerateMeta(sheet,fileName);
                 var dict = new ConcurrentDictionary<string, string>();
                 var code = new GC().GenerateCode(d, ref dict);

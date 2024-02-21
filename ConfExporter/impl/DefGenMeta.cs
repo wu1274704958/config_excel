@@ -46,12 +46,14 @@ namespace impl
         {
             new NotNull(),
             new Reference(),
+            new EnumRef(),
             new Others()
         };
         public static readonly List<ITagParser> TagParsers = new List<ITagParser>()
         {
             new Key(),
             new Sealed(),
+            new CustomEnum(),
             new Others()
         };
         public static readonly List<IFiledType> FieldTypes = new List<IFiledType>()

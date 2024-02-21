@@ -20,6 +20,9 @@ namespace impl
             AppendImport(sb);
             AppendNameSpaceHead(sb, meta.Package);
             AppendLeftCurlyBraces(sb);
+            //custom enum
+            if(meta.Tags.TryGetValue(nameof(CustomEnum), out var customEnumDict))
+                AppendCustomEnum(sb, meta, customEnumDict as Dictionary<string,List<(string,string)>>);
             //data class
             var sealedVal = meta.Tags.TryGetValue(nameof(Sealed), out var v) ? (int)v : 0;
             AppendClassHead(sb, meta.ClassName,(sealedVal & 1) == 1);
@@ -31,7 +34,7 @@ namespace impl
             AppendLeftCurlyBraces(sb);
             AppendMgrClassBody(sb, meta);
             AppendRightCurlyBraces(sb);
-            
+            //end
             AppendRightCurlyBraces(sb);
             var dir = meta.Package;
             var dotIdx = -1;
@@ -41,6 +44,27 @@ namespace impl
             if(!codeList.TryAdd($"{dir}/{meta.MgrClassName}", sb.ToString()))
                 throw new Exception("Same code exists: "+meta.MgrClassName);
             return res;
+        }
+
+        private void AppendCustomEnum(StringBuilder sb, DefMetaData meta, Dictionary<string,List<(string,string)>> dictionary)
+        {
+            foreach (var it in dictionary)
+            {
+                AppendCustomEnum(sb, meta, it.Key, it.Value);
+            }
+        }
+
+        private void AppendCustomEnum(StringBuilder sb, DefMetaData meta, string name, List<(string, string)> kv)
+        {
+            sb.Append($@"public enum {name} {{");
+            foreach (var it in kv)
+            {
+                if(it.Item2 == null)
+                    sb.Append($"{it.Item1},");
+                else
+                    sb.Append($"{it.Item1} = {it.Item2},");
+            }
+            sb.Append("}");
         }
 
         private void AppendMgrClassBody(StringBuilder sb, DefMetaData meta)
@@ -95,6 +119,8 @@ public static void AppendData(Int32 id,{meta.ClassName} d)
                 sb.AppendLine($"[ProtoMember({i})] public {f.TypeClassName} {f.Name} {{ get; private set; }}");
                 if (f.Tags.TryGetValue(nameof(Reference), out var v))
                     sb.AppendLine($"public {v} {f.Name}Ref => {v}Mgr.GetInstance().Get({f.Name});");
+                if (f.Tags.TryGetValue(nameof(EnumRef), out var eValue))
+                    sb.AppendLine($"public {eValue} {f.Name}_e => ({eValue}){f.Name};");
                 ++i;
             }
         }
