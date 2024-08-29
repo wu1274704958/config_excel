@@ -107,7 +107,7 @@ public static void Save(FileInfo file)
         Serializer.SerializeWithLengthPrefix(fs, _instance, PrefixStyle.Fixed32);
     }}
 }}
-public static void AppendData(Int32 id,{meta.ClassName} d)
+public static void AppendData({keyTy} id,{meta.ClassName} d)
 {{
     if (_instance == null)
         _instance = new {mgrName}();
