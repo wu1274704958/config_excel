@@ -5,8 +5,10 @@ using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
+using System.Linq;
 using CommandLine;
 using conf;
+using core;
 using impl;
 using NPOI.HSSF.UserModel;
 using NPOI.SS.UserModel;
@@ -26,6 +28,8 @@ namespace ConfExporter
             public string InputFile { get; set; }
             [Option(Required = false,Default = false,HelpText = "only gen data")]
             public bool OnlyGenData { get; set; }
+            [Option(Required = false,Default = null,HelpText = "choose sheets need exported ,like SheetA,SheetB")]
+            public string ExportSheets { get; set; }
         }
         public static void Main(string[] args)
         {
@@ -63,7 +67,12 @@ namespace ConfExporter
             var dataOutDir = new DirectoryInfo(obj.DataOutDir);
             if (codeOutDir.Exists == false) codeOutDir.Create();
             if (dataOutDir.Exists == false) dataOutDir.Create();
-            var count = new DefExporter().Export(@in.ToArray(), codeOutDir, dataOutDir, obj.OnlyGenData);
+            var option = new ExportOption();
+            if(obj.ExportSheets != null)
+            {
+                option.ChooseSheet = obj.ExportSheets.Split(',').ToHashSet();
+            }
+            var count = new DefExporter().Export(@in.ToArray(), codeOutDir, dataOutDir, obj.OnlyGenData,option);
             Console.WriteLine($"done {count}");
         }
 

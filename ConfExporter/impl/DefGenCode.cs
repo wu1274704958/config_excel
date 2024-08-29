@@ -22,15 +22,16 @@ namespace impl
             AppendLeftCurlyBraces(sb);
             //custom enum
             if(meta.Tags.TryGetValue(nameof(CustomEnum), out var customEnumDict))
-                AppendCustomEnum(sb, meta, customEnumDict as Dictionary<string,List<(string,string)>>);
+                AppendCustomEnum(sb, meta, customEnumDict as CustomEnum.CustomEnumMetaData);
             //data class
             var sealedVal = meta.Tags.TryGetValue(nameof(Sealed), out var v) ? (int)v : 0;
-            AppendClassHead(sb, meta.ClassName,(sealedVal & 1) == 1);
+            var partialVal = meta.Tags.TryGetValue(nameof(Partial), out v) ? (int)v : 0;
+            AppendClassHead(sb, meta.ClassName,(sealedVal & 1) == 1,(partialVal & 1) == 1);
             AppendLeftCurlyBraces(sb);
             AppendClassBody(sb, meta);
             AppendRightCurlyBraces(sb);
             //mgr class
-            AppendClassHead(sb, meta.MgrClassName,(sealedVal & 2) == 2);
+            AppendClassHead(sb, meta.MgrClassName,(sealedVal & 2) == 2,(partialVal & 2) == 2);
             AppendLeftCurlyBraces(sb);
             AppendMgrClassBody(sb, meta);
             AppendRightCurlyBraces(sb);
@@ -45,17 +46,21 @@ namespace impl
                 throw new Exception("Same code exists: "+meta.MgrClassName);
             return res;
         }
+        
+        
 
-        private void AppendCustomEnum(StringBuilder sb, DefMetaData meta, Dictionary<string,List<(string,string)>> dictionary)
+        private void AppendCustomEnum(StringBuilder sb, DefMetaData meta, CustomEnum.CustomEnumMetaData dictionary)
         {
-            foreach (var it in dictionary)
+            foreach (var it in dictionary.Data)
             {
-                AppendCustomEnum(sb, meta, it.Key, it.Value);
+                AppendCustomEnum(sb, meta, it.Key, it.Value.Item1,it.Value.Item2);
             }
         }
 
-        private void AppendCustomEnum(StringBuilder sb, DefMetaData meta, string name, List<(string, string)> kv)
+        private void AppendCustomEnum(StringBuilder sb, DefMetaData meta, string name, List<(string, string)> kv,Dictionary<string,object> tags = null)
         {
+            if(tags != null && tags.TryGetValue(nameof(Flags), out var v) && (bool)v)
+                sb.AppendLine("[Flags]");
             sb.Append($@"public enum {name} {{");
             foreach (var it in kv)
             {
@@ -73,6 +78,7 @@ namespace impl
             var mgrName = meta.MgrClassName;
             sb.Append($@"
 [ProtoMember(1)] private Dictionary<{keyTy},{meta.ClassName}> _dict = new Dictionary<{keyTy}, {meta.ClassName}>();
+public IReadOnlyDictionary<{keyTy},{meta.ClassName}> Dict => _dict; 
 public {meta.ClassName} Get({keyTy} id) => _dict.TryGetValue(id, out var t) ? t : null;
 private static {mgrName} _instance = null;
 public static {mgrName} GetInstance()=> _instance;
@@ -125,9 +131,9 @@ public static void AppendData(Int32 id,{meta.ClassName} d)
             }
         }
 
-        private void AppendClassHead(StringBuilder sb, string className,bool @sealed = false)
+        private void AppendClassHead(StringBuilder sb, string className,bool @sealed = false,bool partial = false)
         {
-            var preClass = @sealed ? "sealed" : "";
+            var preClass = $"{(@sealed ? "sealed" : "")} {(partial ? "partial" : "")}";
             sb.Append($@"
 [ProtoContract]
 public {preClass} class {className}

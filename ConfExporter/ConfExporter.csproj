@@ -118,6 +118,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="core\Context.cs" />
     <Compile Include="core\filed_type\InternalArrayType.cs" />
     <Compile Include="core\filed_type\InternalDictType.cs" />
     <Compile Include="core\IExporter.cs" />
@@ -132,10 +133,15 @@
     <Compile Include="impl\DefGenMeta.cs" />
     <Compile Include="impl\DefLoad.cs" />
     <Compile Include="impl\DefSerializer.cs" />
+    <Compile Include="impl\tags\CustomEnum.cs" />
+    <Compile Include="impl\tags\Default.cs" />
+    <Compile Include="impl\tags\EnumRef.cs" />
     <Compile Include="impl\tags\Key.cs" />
     <Compile Include="impl\tags\NotNull.cs" />
     <Compile Include="impl\tags\Others.cs" />
+    <Compile Include="impl\tags\Partial.cs" />
     <Compile Include="impl\tags\Reference.cs" />
+    <Compile Include="impl\tags\Sealed.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="unit_test\TestDynLoadCode.cs" />

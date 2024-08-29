@@ -23,7 +23,7 @@ namespace core.filed_type
                 throw new Exception($"Dictionary inside Val type is null {typeof(V).FullName} row:{v.RowIndex} col:{v.ColumnIndex}");
             if(v.CellType == CellType.String && !string.IsNullOrEmpty(v.StringCellValue))
                 return ParseValue(v.StringCellValue);
-            throw new Exception($"Dictionary type must be string row:{v.RowIndex} col:{v.ColumnIndex} KeyType:{InsideKeyType.FullTypeName} ValType:{InsideValType.FullTypeName}");
+            //throw new Exception($"Dictionary type must be string row:{v.RowIndex} col:{v.ColumnIndex} KeyType:{InsideKeyType.FullTypeName} ValType:{InsideValType.FullTypeName}");
             return null;
         }
 

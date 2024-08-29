@@ -19,7 +19,6 @@ namespace core.filed_type
                 throw new Exception($"Array inside type is null {typeof(T).FullName} row:{v.RowIndex} col:{v.ColumnIndex}");
             if(v.CellType == CellType.String && !string.IsNullOrEmpty(v.StringCellValue))
                 return ParseValue(v.StringCellValue);
-            throw new Exception($"Array type must be string row:{v.RowIndex} col:{v.ColumnIndex} InsideType:{InsideType.FullTypeName}");
             return null;
         }
 

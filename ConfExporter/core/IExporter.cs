@@ -1,18 +1,23 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
 using System.IO;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
 namespace core
 {
+    public class ExportOption
+    {
+        public HashSet<string> ChooseSheet;
+    }
     public class IExporter<GM,GC,LD,S,MD,C,D>
     where GM : IGenMeta<MD>,new()
     where GC : IGenCode<MD,C>,new()
     where LD : IDataLoader<D,MD>,new()
     where S : ISerializer<MD,D>,new()
     {
-        public virtual int Export(FileInfo[] @in, DirectoryInfo outCodeDir, DirectoryInfo outDataDir, bool onlyGenData)
+        public virtual int Export(FileInfo[] @in, DirectoryInfo outCodeDir, DirectoryInfo outDataDir, bool onlyGenData, ExportOption exportOption)
         {
             int ret = 0;
             foreach (var f in @in)
@@ -28,6 +33,8 @@ namespace core
                     foreach (var sheet in book)
                     {
                         if(sheet.SheetName[0] == '_')
+                            continue;
+                        if (exportOption.ChooseSheet != null && !exportOption.ChooseSheet.Contains(sheet.SheetName))
                             continue;
                         ret += HandleSheet(sheet, outCodeDir, outDataDir, onlyGenData,fileName);
                     }

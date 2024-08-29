@@ -6,17 +6,31 @@ using NPOI.SS.UserModel;
 
 namespace impl.tags
 {
+    public class Flags : BaseTagParser<Flags>
+    {
+        public override object GetDefaultValue(IFiledType type)
+        {
+            return true;
+        }
+        public override Type ValueType => typeof(bool);
+    }
     public class CustomEnum : BaseTagParser<CustomEnum>
     {
+        public class CustomEnumMetaData
+        {
+            public Dictionary<string, (List<(string, string)>, Dictionary<string, object>)> Data = new Dictionary<string, (List<(string, string)>, Dictionary<string, object>)>();
+        }
         public override object GetDefaultValue(IFiledType type)
         {
             throw new Exception("CustomEnum can not get default value");
         }
 
-        public override Type ValueType => typeof(Dictionary<string,List<(string,string)>>);
+        public override Type ValueType => typeof(CustomEnumMetaData);
+        public static readonly List<ITagParser> TagParsers = new List<ITagParser>() { new Flags() };
+        public Dictionary<string,object> Tags { get; set; }
         protected override object ParseValue_inner(string v)
         {
-            var dict = new Dictionary<string,List<(string,string)>>();
+            var dict = new CustomEnumMetaData();
             try
             {
                 var ss = v.Split(',');
@@ -35,8 +49,9 @@ namespace impl.tags
             return dict;
         }
 
-        private void ParseEnumMetaData(ISheet sheet, ref Dictionary<string,List<(string, string)>> dict)
+        private void ParseEnumMetaData(ISheet sheet, ref CustomEnumMetaData res)
         {
+            Tags = null;
             var name = sheet.SheetName.Replace('_','E');
             var val = new List<(string, string)>();
             for (int i = 0; i <= sheet.LastRowNum; i++)
@@ -53,7 +68,13 @@ namespace impl.tags
                     v = ((int)Math.Truncate(vv.NumericCellValue)).ToString();
                 val.Add((cell.StringCellValue,v));
             }
-            dict.Add(name,val);
+            IRow firstRow = null;
+            ICell tagCell = null;
+            if (sheet.LastRowNum >= 0 && (tagCell = (firstRow = sheet.GetRow(0)).GetCell(2)) != null)
+            {
+                Tags = DefGenMeta.ParseTags(tagCell, null, TagParsers);
+            }
+            res.Data.Add(name,(val,Tags));
         }
     }
 }

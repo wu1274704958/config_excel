@@ -47,12 +47,14 @@ namespace impl
             new NotNull(),
             new Reference(),
             new EnumRef(),
+            new Default(),
             new Others()
         };
         public static readonly List<ITagParser> TagParsers = new List<ITagParser>()
         {
             new Key(),
             new Sealed(),
+            new Partial(),
             new CustomEnum(),
             new Others()
         };
@@ -85,7 +87,8 @@ namespace impl
             new InternalDictType<int,double>(),
             new InternalDictType<int,bool>(),
             new InternalDictType<int,DateTime>(),
-            
+            new InternalDictType<int,Byte>(),
+
             new InternalDictType<string,string>(),
             new InternalDictType<string,int>(),
             new InternalDictType<string,long>(),
@@ -93,6 +96,7 @@ namespace impl
             new InternalDictType<string,double>(),
             new InternalDictType<string,bool>(),
             new InternalDictType<string,DateTime>(),
+            new InternalDictType<string,Byte>(),
         };
         public DefMetaData GenerateMeta(ISheet sheet,string fileName)
         {
@@ -176,7 +180,7 @@ namespace impl
             return fileds;
         }
 
-        private void PreParseTags(ICell cell, Action<string, string> f)
+        private static void PreParseTags(ICell cell, Action<string, string> f)
         {
             string str = null;
             if (cell == null || cell.CellType != CellType.String || (str = cell.StringCellValue) == null) return;
@@ -189,7 +193,7 @@ namespace impl
             }
         }
 
-        private Dictionary<string,object> ParseTags(ICell cell, IFiledType filedType,List<ITagParser> tagParsers)
+        public static Dictionary<string,object> ParseTags(ICell cell, IFiledType filedType,List<ITagParser> tagParsers)
         {
             var res = new Dictionary<string,object>();
             PreParseTags(cell, (k, v) =>
