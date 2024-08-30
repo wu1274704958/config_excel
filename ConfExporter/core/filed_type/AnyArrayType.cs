@@ -1,4 +1,5 @@
-﻿using NPOI.SS.UserModel;
+﻿using conf.plugin;
+using NPOI.SS.UserModel;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -25,6 +26,13 @@ namespace core.filed_type
 
         public string[] PluginFiles => new string[] { "AnyArray.cs" };
 
+        public bool NeedInit => true;
+
+        public string GenInitCode(string objName, bool semicolon)
+        {
+            return $"{objName}.Init(){(semicolon ? ";" : "")}";
+        }
+
         public bool IsMatch(string typeName, Func<string, IFiledType> matchOther = null)
         {
             return typeName == typeof(AnyArray).Name;
@@ -45,7 +53,7 @@ namespace core.filed_type
                 return null;
             try
             {
-                var arr = new AnyArray(v);
+                var arr = new AnyArray(v,true);
                 return arr;
             }catch (Exception e)
             {

@@ -112,8 +112,8 @@ namespace conf.plugin
     public class AnyArray
     {
         [ProtoBuf.ProtoMember(1)]
+        protected string originString;
         protected List<object> objs;
-        [ProtoBuf.ProtoMember(2)]
         protected List<System.Type> tyArr;
         public int Count => objs.Count;
         protected AnyArray() { }
@@ -138,8 +138,13 @@ namespace conf.plugin
             }
         }
 
-        public AnyArray(string str)
+        public AnyArray(string str, bool notParse = false)
         {
+            if (notParse)
+            {
+                originString = str;
+                return;
+            }
             if (str.Length == 0)
             {
                 this.objs = new List<object>();
@@ -147,6 +152,19 @@ namespace conf.plugin
             }
             else
             if (parse(str, out var objs, out var tys))
+            {
+                this.objs = objs;
+                this.tyArr = tys;
+            }
+            else
+            {
+                throw new Exception("Parse AnyArray Failed!!!");
+            }
+        }
+
+        public void Init()
+        {
+            if (originString != null && originString.Length > 0 && parse(originString, out var objs, out var tys))
             {
                 this.objs = objs;
                 this.tyArr = tys;

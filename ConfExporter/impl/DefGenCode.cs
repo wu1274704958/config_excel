@@ -92,6 +92,7 @@ public static void InitInstance(FileInfo file)
         _instance = Serializer.DeserializeWithLengthPrefix<{mgrName}>(fs, PrefixStyle.Fixed32);
         Debug.Assert(_instance != null,""Load Config {meta.ClassName} failed at ""+file.FullName);
         _lastReadFile = file;
+        {(NeedInit(meta) ? GenInitCode( obj => GenInitCode(meta,obj)) : "" )}
     }}
 }}
 
@@ -115,6 +116,40 @@ public static void AppendData({keyTy} id,{meta.ClassName} d)
     _instance._dict.Add(id,d);
 }}
             ");
+        }
+        private bool NeedInit(DefMetaData meta)
+        {
+            foreach(var it in meta.Fileds)
+            {
+                if (it.Type.NeedInit)
+                    return true;
+            }    
+            return false;
+        }
+        private string GenInitCode(Func<string,string> genFunc)
+        {
+            return $@"
+                foreach(var kv in  _instance.Dict)
+                {{
+                    {genFunc("kv.Value")}  
+                }}
+            ";
+        }
+        private string GenInitCode(DefMetaData meta,string obj)
+        {
+            StringBuilder code = new StringBuilder();
+            code.Append($"if({obj} != null){{");
+            foreach(var it in meta.Fileds)
+            {
+                if(it.Type.NeedInit)
+                {
+                    code.Append($"if({obj}.{it.Name} != null){{");
+                    code.AppendLine(it.Type.GenInitCode($"{obj}.{it.Name}",true));
+                    code.Append('}');
+                }
+            }
+            code.Append('}');
+            return code.ToString();
         }
 
         private void AppendClassBody(StringBuilder sb, DefMetaData meta)

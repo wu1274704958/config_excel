@@ -55,6 +55,17 @@ namespace core.filed_type
             }
             return false;
         }
+
+        public string GenInitCode(string objName, bool semicolon)
+        {
+            return $@"
+            foreach(var it in {objName})
+            {{
+                {InsideType.GenInitCode("it", false)};
+            }}
+            "; 
+        }
+
         public string FullTypeName => $"System.Collections.Generic.List<{typeof(T).FullName}>";
         public object DefaultValue => null;
         public Type Type => typeof(List<T>);
@@ -66,6 +77,16 @@ namespace core.filed_type
                 if(InsideType != null)
                     return InsideType.PluginFiles;
                 return null;
+            }
+        }
+
+        public bool NeedInit
+        {
+            get
+            {
+                if (InsideType != null)
+                    return InsideType.NeedInit;
+                return false;
             }
         }
     }

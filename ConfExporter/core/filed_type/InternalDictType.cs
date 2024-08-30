@@ -69,6 +69,16 @@ namespace core.filed_type
             return false;
         }
 
+        public string GenInitCode(string objName, bool semicolon)
+        {
+            return $@"
+            foreach(var it in {objName})
+            {{
+                {InsideValType.GenInitCode("it.Value",false)};
+            }}
+            ";
+        }
+
         public static readonly Regex Reg = new Regex("Dict<(.+),(.+)>");
 
         public string FullTypeName => $"System.Collections.Generic.Dictionary<{typeof(K).FullName},{typeof(V).FullName}>";
@@ -82,7 +92,17 @@ namespace core.filed_type
                 if (InsideValType != null)
                     return InsideValType.PluginFiles;
                 return null;
-            } 
+            }
+        }
+
+        public bool NeedInit
+        {
+            get
+            {
+                if (InsideValType != null)
+                    return InsideValType.NeedInit;
+                return false;
+            }
         }
     }
 }

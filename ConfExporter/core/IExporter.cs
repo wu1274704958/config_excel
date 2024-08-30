@@ -70,10 +70,6 @@ namespace core
                         WriteFile(f.Key, f.Value, ".cs", outPlugDir.FullName);
                     }
                 }
-                foreach (var f in plugDict)
-                {
-                    dict.TryAdd(f.Key, f.Value);
-                }
                 new S().Serialize(d, data, outDataDir, dict);
             }
             catch (Exception e)

@@ -59,7 +59,9 @@ namespace core
         string FullTypeName { get; }
         object DefaultValue { get; }
         Type Type { get; }
-        string[] PluginFiles { get; }        
+        string[] PluginFiles { get; }      
+        bool NeedInit { get; }
+        string GenInitCode(string objName,bool semicolon);
     }
 
     public class BaseInternalFiledType<T> : IFiledType
@@ -204,6 +206,12 @@ namespace core
         {
             return _type.Name.Equals(typeName);
         }
+
+        public string GenInitCode(string objName, bool semicolon)
+        {
+            throw new NotImplementedException();
+        }
+
         public string FullTypeName => _type.FullName;
 
         public object DefaultValue
@@ -227,5 +235,7 @@ namespace core
         }
 
         public string[] PluginFiles => null;
+
+        public bool NeedInit => false;
     }
 }

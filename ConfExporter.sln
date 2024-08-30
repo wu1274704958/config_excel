@@ -5,7 +5,7 @@ VisualStudioVersion = 17.9.34723.18
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ConfExporter", "ConfExporter\ConfExporter.csproj", "{6D95F9A5-E462-4119-BC67-0146BC2FEB3E}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Plugins", "Plugins\Plugins.csproj", "{3D3BAFF1-2F1F-4FAC-836D-95F38AA02D36}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TypePlugins", "TypePlugins\TypePlugins.csproj", "{3DCBDCA6-8EFE-435D-BF3C-5BCC069E6E69}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -17,12 +17,15 @@ Global
 		{6D95F9A5-E462-4119-BC67-0146BC2FEB3E}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{6D95F9A5-E462-4119-BC67-0146BC2FEB3E}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{6D95F9A5-E462-4119-BC67-0146BC2FEB3E}.Release|Any CPU.Build.0 = Release|Any CPU
-		{3D3BAFF1-2F1F-4FAC-836D-95F38AA02D36}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{3D3BAFF1-2F1F-4FAC-836D-95F38AA02D36}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{3D3BAFF1-2F1F-4FAC-836D-95F38AA02D36}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{3D3BAFF1-2F1F-4FAC-836D-95F38AA02D36}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3DCBDCA6-8EFE-435D-BF3C-5BCC069E6E69}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3DCBDCA6-8EFE-435D-BF3C-5BCC069E6E69}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3DCBDCA6-8EFE-435D-BF3C-5BCC069E6E69}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3DCBDCA6-8EFE-435D-BF3C-5BCC069E6E69}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {C43C9539-A179-4F8A-AEDD-BE5820194B29}
 	EndGlobalSection
 EndGlobal
