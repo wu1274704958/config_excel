@@ -40,7 +40,12 @@ namespace impl
                 for (int j = 0; j < meta.Fileds.Count; j++)
                 {
                     var f = meta.Fileds[j];
-                    dataTy.GetProperty(f.Name).SetValue(obj, row[j]);
+                    try
+                    {
+                        dataTy.GetProperty(f.Name).SetValue(obj, row[j]);
+                    }catch(Exception e) {
+                        throw new Exception($"Append Data set value failed key = {key}", e);
+                    }
                 }
                 try
                 {
@@ -69,7 +74,8 @@ namespace impl
             compilerParams.ReferencedAssemblies.Add("System.Core.dll");
             compilerParams.ReferencedAssemblies.Add("System.Memory.dll");
             compilerParams.ReferencedAssemblies.Add("System.Xml.dll");
-
+            compilerParams.ReferencedAssemblies.Add("System.Numerics.dll");
+            compilerParams.ReferencedAssemblies.Add("Plugins.dll");
             // 创建 C# 编译器
             CSharpCodeProvider codeProvider = new Microsoft.CodeDom.Providers.DotNetCompilerPlatform.CSharpCodeProvider();
             // 编译代码并获取编译结果

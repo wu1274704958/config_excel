@@ -5,7 +5,7 @@ using NPOI.SS.UserModel;
 
 namespace core.filed_type
 {
-    public class InternalDictType<K,V> : IFiledType
+    public class InternalDictType<K, V> : IFiledType
     {
         public IFiledType InsideKeyType { get; protected set; } = null;
         public IFiledType InsideValType { get; protected set; } = null;
@@ -17,11 +17,11 @@ namespace core.filed_type
 
         public object ParseValue(ICell v)
         {
-            if(InsideKeyType == null )
+            if (InsideKeyType == null)
                 throw new Exception($"Dictionary inside Key type is null {typeof(K).FullName} row:{v.RowIndex} col:{v.ColumnIndex}");
-            if(InsideValType == null)
+            if (InsideValType == null)
                 throw new Exception($"Dictionary inside Val type is null {typeof(V).FullName} row:{v.RowIndex} col:{v.ColumnIndex}");
-            if(v.CellType == CellType.String && !string.IsNullOrEmpty(v.StringCellValue))
+            if (v.CellType == CellType.String && !string.IsNullOrEmpty(v.StringCellValue))
                 return ParseValue(v.StringCellValue);
             //throw new Exception($"Dictionary type must be string row:{v.RowIndex} col:{v.ColumnIndex} KeyType:{InsideKeyType.FullTypeName} ValType:{InsideValType.FullTypeName}");
             return null;
@@ -37,9 +37,9 @@ namespace core.filed_type
                 for (int i = 0; i < len; i++)
                 {
                     var mid = ss[i].IndexOf(':');
-                    if(mid < 0) throw new Exception($"Parse dictionary value error: {ss[i]} KeyType:{InsideKeyType.FullTypeName} ValType:{InsideValType.FullTypeName}");
+                    if (mid < 0) throw new Exception($"Parse dictionary value error: {ss[i]} KeyType:{InsideKeyType.FullTypeName} ValType:{InsideValType.FullTypeName}");
                     var key = InsideKeyType.ParseValue(ss[i].Substring(0, mid));
-                    if(key == null)
+                    if (key == null)
                         throw new Exception($"Parse dictionary key error: {ss[i]} KeyType:{InsideKeyType.FullTypeName} ValType:{InsideValType.FullTypeName}");
                     res.Add((K)key, (V)InsideValType.ParseValue(ss[i].Substring(mid + 1)));
                 }
@@ -59,7 +59,7 @@ namespace core.filed_type
                 var valTypeName = match.Groups[2].Value;
                 var keyType = matchOther?.Invoke(keyTypeName);
                 var valType = matchOther?.Invoke(valTypeName);
-                if (keyType != null && valType != null &&  keyType.Type == typeof(K) && valType.Type == typeof(V))
+                if (keyType != null && valType != null && keyType.Type == typeof(K) && valType.Type == typeof(V))
                 {
                     InsideKeyType = keyType;
                     InsideValType = valType;
@@ -73,6 +73,16 @@ namespace core.filed_type
 
         public string FullTypeName => $"System.Collections.Generic.Dictionary<{typeof(K).FullName},{typeof(V).FullName}>";
         public object DefaultValue => null;
-        public Type Type => typeof(Dictionary<K,V>);
+        public Type Type => typeof(Dictionary<K, V>);
+
+        public string[] PluginFiles
+        {
+            get
+            {
+                if (InsideValType != null)
+                    return InsideValType.PluginFiles;
+                return null;
+            } 
+        }
     }
 }

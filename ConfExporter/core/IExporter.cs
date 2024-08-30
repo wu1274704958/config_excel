@@ -2,6 +2,7 @@
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.IO;
+using ConfExporter.core;
 using NPOI.SS.UserModel;
 using NPOI.XSSF.UserModel;
 
@@ -11,11 +12,12 @@ namespace core
     {
         public HashSet<string> ChooseSheet;
     }
-    public class IExporter<GM,GC,LD,S,MD,C,D>
+    public class IExporter<GM,GC,LD,S,MD,C,D,PH>
     where GM : IGenMeta<MD>,new()
     where GC : IGenCode<MD,C>,new()
     where LD : IDataLoader<D,MD>,new()
     where S : ISerializer<MD,D>,new()
+    where PH : IPluginHandler<MD>,new()
     {
         public virtual int Export(FileInfo[] @in, DirectoryInfo outCodeDir, DirectoryInfo outDataDir, bool onlyGenData, ExportOption exportOption)
         {
@@ -59,6 +61,19 @@ namespace core
                     }
                 }
                 var data = new LD().Load(sheet, d);
+                var plugDict = new ConcurrentDictionary<string, string>();
+                if (new PH().Handle(d, ref plugDict) && !onlyGenData)
+                {
+                    var outPlugDir = outCodeDir.CreateSubdirectory("plugins");
+                    foreach (var f in plugDict)
+                    {
+                        WriteFile(f.Key, f.Value, ".cs", outPlugDir.FullName);
+                    }
+                }
+                foreach (var f in plugDict)
+                {
+                    dict.TryAdd(f.Key, f.Value);
+                }
                 new S().Serialize(d, data, outDataDir, dict);
             }
             catch (Exception e)

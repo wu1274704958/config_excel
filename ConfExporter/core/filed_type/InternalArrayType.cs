@@ -58,5 +58,15 @@ namespace core.filed_type
         public string FullTypeName => $"System.Collections.Generic.List<{typeof(T).FullName}>";
         public object DefaultValue => null;
         public Type Type => typeof(List<T>);
+
+        public string[] PluginFiles
+        {
+            get
+            {
+                if(InsideType != null)
+                    return InsideType.PluginFiles;
+                return null;
+            }
+        }
     }
 }

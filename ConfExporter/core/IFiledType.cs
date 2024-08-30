@@ -59,6 +59,7 @@ namespace core
         string FullTypeName { get; }
         object DefaultValue { get; }
         Type Type { get; }
+        string[] PluginFiles { get; }        
     }
 
     public class BaseInternalFiledType<T> : IFiledType
@@ -224,5 +225,7 @@ namespace core
                 return null;
             }
         }
+
+        public string[] PluginFiles => null;
     }
 }

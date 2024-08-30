@@ -4,6 +4,7 @@ using core;
 using core.filed_type;
 using impl.tags;
 using NPOI.SS.UserModel;
+using conf.plugin;
 
 namespace impl
 {
@@ -69,7 +70,9 @@ namespace impl
             new BaseInternalFiledType<long>(),
             new BaseInternalFiledType<short>(),
             new BaseInternalFiledType<byte>(),
-            
+
+            new AnyArrayType(),
+
             new InternalArrayType<string>(),
             new InternalArrayType<double>(),
             new InternalArrayType<float>(),
@@ -79,7 +82,8 @@ namespace impl
             new InternalArrayType<long>(),
             new InternalArrayType<short>(),
             new InternalArrayType<byte>(),
-            
+            new InternalArrayType<AnyArray>(),
+
             new InternalDictType<int,string>(),
             new InternalDictType<int,int>(),
             new InternalDictType<int,long>(),
@@ -97,6 +101,9 @@ namespace impl
             new InternalDictType<string,bool>(),
             new InternalDictType<string,DateTime>(),
             new InternalDictType<string,Byte>(),
+
+            new InternalDictType<string,AnyArray>(),
+            new InternalDictType<int,AnyArray>(),
         };
         public DefMetaData GenerateMeta(ISheet sheet,string fileName)
         {

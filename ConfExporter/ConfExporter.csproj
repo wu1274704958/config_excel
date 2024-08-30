@@ -91,6 +91,7 @@
     <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="System.Memory, Version=4.0.1.2, Culture=neutral, PublicKeyToken=cc7b13ffcd2ddd51, processorArchitecture=MSIL">
       <HintPath>..\packages\System.Memory.4.5.5\lib\net461\System.Memory.dll</HintPath>
     </Reference>
@@ -119,6 +120,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="core\Context.cs" />
+    <Compile Include="core\filed_type\AnyArrayType.cs" />
     <Compile Include="core\filed_type\InternalArrayType.cs" />
     <Compile Include="core\filed_type\InternalDictType.cs" />
     <Compile Include="core\IExporter.cs" />
@@ -126,12 +128,15 @@
     <Compile Include="core\IGenCode.cs" />
     <Compile Include="core\IGenMeta.cs" />
     <Compile Include="core\ILoadData.cs" />
+    <Compile Include="core\IPluginHandler.cs" />
     <Compile Include="core\ISerializer.cs" />
     <Compile Include="core\ITagParser.cs" />
+    <EmbeddedResource Include="data\plugins\AnyArray.cs" />
     <Compile Include="impl\DefExporter.cs" />
     <Compile Include="impl\DefGenCode.cs" />
     <Compile Include="impl\DefGenMeta.cs" />
     <Compile Include="impl\DefLoad.cs" />
+    <Compile Include="impl\DefPluginHandler.cs" />
     <Compile Include="impl\DefSerializer.cs" />
     <Compile Include="impl\tags\CustomEnum.cs" />
     <Compile Include="impl\tags\Default.cs" />
@@ -151,6 +156,12 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Plugins\Plugins.csproj">
+      <Project>{3d3baff1-2f1f-4fac-836d-95f38aa02d36}</Project>
+      <Name>Plugins</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <Import Project="..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets" Condition="Exists('..\packages\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.4.1.0\build\net472\Microsoft.CodeDom.Providers.DotNetCompilerPlatform.targets')" />

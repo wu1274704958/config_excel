@@ -8,7 +8,7 @@ using NPOI.XSSF.UserModel;
 
 namespace impl
 {
-    public class DefExporter : IExporter<DefGenMeta,DefGenCode,DefLoader,DefSerializer,DefMetaData,GenCodeResult,TableData>
+    public class DefExporter : IExporter<DefGenMeta,DefGenCode,DefLoader,DefSerializer,DefMetaData,GenCodeResult,TableData,DefPluginHandler>
     {
         
     }
