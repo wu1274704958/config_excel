@@ -72,6 +72,7 @@ namespace impl
             new BaseInternalFiledType<byte>(),
 
             new AnyArrayType(),
+            new TimeSpanType(),
 
             new InternalArrayType<string>(),
             new InternalArrayType<double>(),
@@ -83,6 +84,7 @@ namespace impl
             new InternalArrayType<short>(),
             new InternalArrayType<byte>(),
             new InternalArrayType<AnyArray>(),
+            new InternalArrayType<TimeSpan>(),
 
             new InternalDictType<int,string>(),
             new InternalDictType<int,int>(),
@@ -104,6 +106,9 @@ namespace impl
 
             new InternalDictType<string,AnyArray>(),
             new InternalDictType<int,AnyArray>(),
+
+            new InternalDictType<string,TimeSpan>(),
+            new InternalDictType<int,TimeSpan>(),
         };
         public DefMetaData GenerateMeta(ISheet sheet,string fileName)
         {
