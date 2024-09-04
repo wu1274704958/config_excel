@@ -64,7 +64,6 @@ namespace impl
             new BaseInternalFiledType<string>(),
             new BaseInternalFiledType<double>(),
             new BaseInternalFiledType<float>(),
-            new BaseInternalFiledType<DateTime>(),
             new BaseInternalFiledType<bool>(),
             new BaseInternalFiledType<int>(),
             new BaseInternalFiledType<long>(),
@@ -73,6 +72,7 @@ namespace impl
 
             new AnyArrayType(),
             new TimeSpanType(),
+            new DateTimeType(),
 
             new InternalArrayType<string>(),
             new InternalArrayType<double>(),
