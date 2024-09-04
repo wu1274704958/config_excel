@@ -44,7 +44,7 @@ namespace impl
                     {
                         dataTy.GetProperty(f.Name).SetValue(obj, row[j]);
                     }catch(Exception e) {
-                        throw new Exception($"Append Data set value failed key = {key}", e);
+                        throw new Exception($"Append Data set value failed key = [{key}]", e);
                     }
                 }
                 try

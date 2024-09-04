@@ -136,6 +136,7 @@
   <ItemGroup>
     <Compile Include="core\Context.cs" />
     <Compile Include="core\filed_type\AnyArrayType.cs" />
+    <Compile Include="core\filed_type\DateTimeType.cs" />
     <Compile Include="core\filed_type\InternalArrayType.cs" />
     <Compile Include="core\filed_type\InternalDictType.cs" />
     <Compile Include="core\filed_type\TimeSpanType.cs" />

@@ -180,7 +180,7 @@ namespace impl
                 filedMetaData.TypeEnum = ParseFiledType(cell,firstData,out string typeClassName,out var filedType);
                 filedMetaData.Type = filedType;
                 if (filedMetaData.TypeEnum == EFiledType.None || filedMetaData.Type == null)
-                    throw new Exception("GenerateMeta Error :parse filed type failed");
+                    throw new Exception($"GenerateMeta Error : {filedMetaData.Name} parse filed type failed");
                 filedMetaData.TypeClassName = typeClassName;
                 cell = sheet.GetRow(FieldTagsRow)?.GetCell(i);
                 filedMetaData.Tags = ParseTags(cell,filedMetaData.Type,FieldTagParsers);
