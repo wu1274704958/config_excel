@@ -5,6 +5,7 @@ using core.filed_type;
 using impl.tags;
 using NPOI.SS.UserModel;
 using conf.plugin;
+using ConfExporter.core.filed_type;
 
 namespace impl
 {
@@ -74,6 +75,11 @@ namespace impl
             new TimeSpanType(),
             new DateTimeType(),
 
+            new PairType<int,int>(),
+            new PairType<string,int>(),
+            new PairType<int,string>(),
+            new PairType<string,string>(),
+
             new InternalArrayType<string>(),
             new InternalArrayType<double>(),
             new InternalArrayType<float>(),
@@ -85,6 +91,11 @@ namespace impl
             new InternalArrayType<byte>(),
             new InternalArrayType<AnyArray>(),
             new InternalArrayType<TimeSpan>(),
+
+            new InternalArrayType<KeyValuePair<int,int>>(),
+            new InternalArrayType<KeyValuePair<string,int>>(),
+            new InternalArrayType<KeyValuePair<int,string>>(),
+            new InternalArrayType<KeyValuePair<string,string>>(),
 
             new InternalDictType<int,string>(),
             new InternalDictType<int,int>(),
@@ -109,6 +120,16 @@ namespace impl
 
             new InternalDictType<string,TimeSpan>(),
             new InternalDictType<int,TimeSpan>(),
+
+            new InternalDictType<int,KeyValuePair<int,int>>(),
+            new InternalDictType<int,KeyValuePair<string,int>>(),
+            new InternalDictType<int,KeyValuePair<int,string>>(),
+            new InternalDictType<int,KeyValuePair<string,string>>(),
+
+            new InternalDictType<string,KeyValuePair<int,int>>(),
+            new InternalDictType<string,KeyValuePair<string,int>>(),
+            new InternalDictType<string,KeyValuePair<int,string>>(),
+            new InternalDictType<string,KeyValuePair<string,string>>(),
         };
         public DefMetaData GenerateMeta(ISheet sheet,string fileName)
         {
@@ -239,7 +260,7 @@ namespace impl
         {
             foreach (var ty in FieldTypes)
             {
-                if (ty.IsMatch(specifiedTy))
+                if (ty.IsMatch(specifiedTy,MatchOtherType))
                 {
                     return ty;
                 }

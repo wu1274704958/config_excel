@@ -52,11 +52,14 @@ namespace core.filed_type
         public bool IsDictionary => false;
         public bool IsMatch(string typeName, Func<string, IFiledType> matchOther = null)
         {
-            var match = Reg.Match(typeName);
-            if (match.Success && match.Groups.Count == 3)
+            if (typeName.StartsWith("Dict<") && typeName[typeName.Length - 1] == '>')
             {
-                var keyTypeName = match.Groups[1].Value;
-                var valTypeName = match.Groups[2].Value;
+                var inner = typeName.Substring(5, typeName.Length - 6);
+                var index = inner.IndexOf(',');
+                if (index < 0)
+                    return false;
+                var keyTypeName = inner.Substring(0,index);
+                var valTypeName = inner.Substring(index + 1);
                 var keyType = matchOther?.Invoke(keyTypeName);
                 var valType = matchOther?.Invoke(valTypeName);
                 if (keyType != null && valType != null && keyType.Type == typeof(K) && valType.Type == typeof(V))
@@ -79,9 +82,7 @@ namespace core.filed_type
             ";
         }
 
-        public static readonly Regex Reg = new Regex("Dict<(.+),(.+)>");
-
-        public string FullTypeName => $"System.Collections.Generic.Dictionary<{typeof(K).FullName},{typeof(V).FullName}>";
+        public string FullTypeName => $"System.Collections.Generic.Dictionary<{InsideKeyType.FullTypeName},{InsideValType.FullTypeName}>";
         public object DefaultValue => null;
         public Type Type => typeof(Dictionary<K, V>);
 

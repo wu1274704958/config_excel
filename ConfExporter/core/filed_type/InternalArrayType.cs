@@ -66,7 +66,7 @@ namespace core.filed_type
             "; 
         }
 
-        public string FullTypeName => $"System.Collections.Generic.List<{typeof(T).FullName}>";
+        public string FullTypeName => $"System.Collections.Generic.List<{InsideType.FullTypeName}>";
         public object DefaultValue => null;
         public Type Type => typeof(List<T>);
 
