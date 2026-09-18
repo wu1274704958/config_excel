@@ -30,6 +30,8 @@ namespace ConfExporter
             public bool OnlyGenData { get; set; }
             [Option(Required = false,Default = null,HelpText = "choose sheets need exported ,like SheetA,SheetB")]
             public string ExportSheets { get; set; }
+            [Option("backend", Required = false, Default = "csharp", HelpText = "export backend: csharp or cpp")]
+            public string Backend { get; set; }
         }
         public static void Main(string[] args)
         {
@@ -72,8 +74,23 @@ namespace ConfExporter
             {
                 option.ChooseSheet = obj.ExportSheets.Split(',').ToHashSet();
             }
-            var count = new DefExporter().Export(@in.ToArray(), codeOutDir, dataOutDir, obj.OnlyGenData,option);
+            int count;
+            switch ((obj.Backend ?? "csharp").ToLowerInvariant())
+            {
+                case "csharp":
+                    count = new DefExporter().Export(@in.ToArray(), codeOutDir, dataOutDir, obj.OnlyGenData, option);
+                    break;
+                case "cpp":
+                    if (obj.OnlyGenData)
+                        throw new ArgumentException("The C++ backend only generates source code.");
+                    count = new CppExporter().Export(@in.ToArray(), codeOutDir, dataOutDir, option);
+                    break;
+                default:
+                    throw new ArgumentException("Unsupported backend: " + obj.Backend);
+            }
             Console.WriteLine($"done {count}");
+            if (count < 0)
+                Environment.ExitCode = 1;
         }
 
         private static void LoadTable(string[] args)

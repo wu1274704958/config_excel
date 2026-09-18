@@ -102,7 +102,7 @@ public static void Reload()
 }}
 public static void Save(FileInfo file)
 {{
-    using (FileStream fs = file.Open(FileMode.OpenOrCreate, FileAccess.Write))
+    using (FileStream fs = file.Open(FileMode.Create, FileAccess.Write))
     {{
         Serializer.SerializeWithLengthPrefix(fs, _instance, PrefixStyle.Fixed32);
     }}

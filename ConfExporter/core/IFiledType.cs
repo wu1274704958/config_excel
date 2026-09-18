@@ -151,7 +151,9 @@ namespace core
                     case Type t when t == typeof(long): 
                         return v.CellType == CellType.Numeric || v.CellType == CellType.Formula ? (long)v.NumericCellValue : throw new Exception($"Parse value error type is {_type}: content:{v.Address} cellty = {v.CellType}");
                     case Type t when t == typeof(DateTime): 
-                        return v.CellType == CellType.Numeric && v.CellStyle.DataFormat == 14 ? v.DateCellValue : throw new Exception($"Parse value error type is {_type}: content:{v.Address} cellty = {v.CellType}");
+                        if (v.CellType == CellType.String)
+                            return ParseValue(v.StringCellValue);
+                        return v.CellType == CellType.Numeric ? v.DateCellValue : throw new Exception($"Parse value error type is {_type}: content:{v.Address} cellty = {v.CellType}");
                     case Type t when t == typeof(bool): 
                         return v.CellType == CellType.Boolean ? v.BooleanCellValue : throw new Exception($"Parse value error type is {_type}: content:{v} cellty = {v.CellType}");
                 }
@@ -184,7 +186,7 @@ namespace core
                     case Type t when t == typeof(long): 
                         return long.Parse(v);
                     case Type t when t == typeof(DateTime): 
-                        return Convert.ToDateTime(v);
+                        return DateTime.Parse(v, CultureInfo.InvariantCulture, DateTimeStyles.AllowWhiteSpaces);
                     case Type t when t == typeof(bool): 
                         return bool.Parse(v);
                 }

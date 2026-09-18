@@ -129,6 +129,8 @@
     <Compile Include="core\ISerializer.cs" />
     <Compile Include="core\ITagParser.cs" />
     <Compile Include="impl\DefExporter.cs" />
+    <Compile Include="impl\CppExporter.cs" />
+    <Compile Include="impl\CppGenCode.cs" />
     <Compile Include="impl\DefGenCode.cs" />
     <Compile Include="impl\DefGenMeta.cs" />
     <Compile Include="impl\DefLoad.cs" />
