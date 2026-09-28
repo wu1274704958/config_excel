@@ -74,6 +74,7 @@ namespace impl
             new AnyArrayType(),
             new TimeSpanType(),
             new DateTimeType(),
+            new Vector2Type(),
 
             new PairType<int,int>(),
             new PairType<string,int>(),

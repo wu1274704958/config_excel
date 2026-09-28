@@ -141,6 +141,7 @@
     <Compile Include="core\filed_type\InternalDictType.cs" />
     <Compile Include="core\filed_type\PairType.cs" />
     <Compile Include="core\filed_type\TimeSpanType.cs" />
+    <Compile Include="core\filed_type\Vector2Type.cs" />
     <Compile Include="core\IExporter.cs" />
     <Compile Include="core\IFiledType.cs" />
     <Compile Include="core\IGenCode.cs" />
